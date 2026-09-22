@@ -89,6 +89,10 @@ def _configure_mlflow(config: Config) -> str:
     mlflow.set_tracking_uri(uri)
     experiment_name = config.get_nested("training.experiment_name", "loan-approval")
     if mlflow.get_experiment_by_name(experiment_name) is None:
+        # MLflow expands any artifact location to an absolute path when the
+        # experiment is created, so the tracking database ends up carrying this
+        # machine's paths. scripts/make_mlflow_portable.py rewrites them to
+        # relative paths before the project is shared.
         mlflow.create_experiment(experiment_name, artifact_location=artifact_root.as_uri())
     mlflow.set_experiment(experiment_name)
 

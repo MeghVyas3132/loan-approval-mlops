@@ -84,7 +84,7 @@ Grafana.
                                  │
         ┌────────────────────────┼────────────────────────┐
         ▼                        ▼                        ▼
-   pytest (141 tests)      Docker image            GitHub Actions
+   pytest (150 tests)      Docker image            GitHub Actions
                                  │                  CI -> CD -> GHCR
                                  ▼
                     ┌──────────────────────────┐
@@ -114,14 +114,14 @@ The submitted archive is the complete working repository, not just the source:
 | `.git/` | 17 commits - the history itself is part of the deliverable |
 | `.dvc/cache/` | the DVC object store, so `dvc checkout` and `dvc status` work offline with no remote |
 | `data/`, `models/` | the exact data and model the reported metrics came from |
-| `mlflow.db`, `mlartifacts/` | the recorded experiment runs, openable in the MLflow UI |
+| `mlflow.db`, `mlartifacts/` | the recorded experiment runs, openable in the MLflow UI (paths already made relative) |
 | `reports/` | validation report, metrics, confusion matrix and ROC curve |
 
 So the project runs immediately after unzipping:
 
 ```bash
 pip install -r requirements-dev.txt
-pytest                                                  # 141 tests
+pytest                                                  # 150 tests
 dvc status                                              # pipeline up to date
 python app.py                                           # http://localhost:8000/docs
 mlflow ui --backend-store-uri sqlite:///mlflow.db       # http://localhost:5000
@@ -183,7 +183,8 @@ loan-approval-mlops/
 │   ├── monitoring/              # PSI drift detection
 │   ├── utils/                   # logging + IO helpers
 │   └── config.py                # typed access to params.yaml
-├── tests/                       # 141 tests, 96% coverage
+├── scripts/                     # make_mlflow_portable.py
+├── tests/                       # 150 tests, 96% coverage
 ├── deployment/
 │   ├── docker/                  # docker-compose stack (API + Prometheus + Grafana)
 │   └── kubernetes/              # namespace, deployment, service, HPA, ingress, PDB,
@@ -317,12 +318,22 @@ The run id is written into `models/model_metadata.json` and served by the API at
 `GET /model-info`, so a prediction in production is traceable back to the exact
 experiment that produced the model.
 
+MLflow records an absolute artifact path for each run, which would break the UI
+on anyone else's checkout. `scripts/make_mlflow_portable.py` rewrites those
+paths to be relative to the project root, so the tracking database travels with
+the repository:
+
+```bash
+python scripts/make_mlflow_portable.py --dry-run   # report what would change
+python scripts/make_mlflow_portable.py             # rewrite in place
+```
+
 ---
 
 ## 4. Testing
 
 ```bash
-pytest                       # 141 tests, ~12s, coverage gate at 85%
+pytest                       # 150 tests, ~12s, coverage gate at 85%
 pytest -m "not integration"  # unit tests only
 pytest --cov-report=html     # browsable report in htmlcov/
 ```
@@ -339,6 +350,7 @@ pytest --cov-report=html     # browsable report in htmlcov/
 | `test_monitoring.py` | PSI maths, drift classification bands, report generation |
 | `test_pipeline_stages.py` | all five stages end to end in a temp workspace |
 | `test_config_utils.py` | configuration resolution and IO helpers |
+| `test_mlflow_portability.py` | the artifact-path rewrite, including idempotency |
 
 Coverage is currently **96%** against an 85% gate enforced in `pyproject.toml`,
 so CI fails if coverage regresses.
@@ -574,7 +586,7 @@ run nightly on a CronJob.
 | Git practices | 4 | granular commits, `.gitignore`, no data or artefacts in git, branch-protected CI |
 | DVC usage | 4 | `data/raw/*.dvc`, `dvc.yaml` (5 stages), `dvc.lock`, remote + `dvc push`, params/metrics/plots tracking |
 | Data pipeline | 4 | `src/ingestion`, `src/validation` (schema contract), `src/transformation` (6 engineered features) |
-| Pytest coverage | 4 | `tests/` - 141 tests, 96% coverage, 85% gate in `pyproject.toml` |
+| Pytest coverage | 4 | `tests/` - 150 tests, 96% coverage, 85% gate in `pyproject.toml` |
 | MLflow tracking | 4 | `src/training/train.py` - nested runs, params, metrics, artefacts, signature, model registry |
 | FastAPI service | 4 | `src/prediction/` - 7 endpoints, Pydantic contract, lifespan model load, OpenAPI docs |
 | Dockerization | 4 | `Dockerfile` (multi-stage, non-root, healthcheck), `.dockerignore`, `docker-compose.yml` |

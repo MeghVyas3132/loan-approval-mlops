@@ -21,7 +21,7 @@
     "Property_Area"
   ],
   "mlflow_experiment_id": "1",
-  "mlflow_run_id": "56d8cf9ec42b4458adc1db4aeda7c731",
+  "mlflow_run_id": "2aadb1b59677419f9602ffccf5eb5bd5",
   "model_name": "logistic_regression",
   "model_path": "models/model.joblib",
   "sklearn_version": "1.9.1",
@@ -32,6 +32,6 @@
     "recall": 0.926952,
     "roc_auc": 0.804854
   },
-  "trained_at": "2026-09-22T17:59:17.781386+00:00",
+  "trained_at": "2026-09-22T18:10:57.503825+00:00",
   "training_rows": 2400
 }
