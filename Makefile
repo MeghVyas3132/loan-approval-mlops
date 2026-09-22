@@ -21,8 +21,10 @@ data:  ## Regenerate the raw dataset and track it with DVC
 	$(PYTHON) -m src.ingestion.generate_data
 	dvc add data/raw/loan_applications.csv
 
-pipeline repro:  ## Run the full DVC pipeline
+pipeline:  ## Run the full DVC pipeline
 	dvc repro
+
+repro: pipeline  ## Alias for `make pipeline`
 
 metrics:  ## Show DVC-tracked metrics
 	dvc metrics show

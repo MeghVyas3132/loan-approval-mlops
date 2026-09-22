@@ -3,7 +3,7 @@
 [![CI](https://github.com/OWNER/loan-approval-mlops/actions/workflows/ci.yml/badge.svg)](../../actions/workflows/ci.yml)
 [![CD](https://github.com/OWNER/loan-approval-mlops/actions/workflows/cd.yml/badge.svg)](../../actions/workflows/cd.yml)
 ![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)
-![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen)
+![Coverage](https://img.shields.io/badge/coverage-96%25-brightgreen)
 
 A production-style machine learning system that decides whether a loan
 application should be **approved** or **rejected**, covering the full lifecycle:
@@ -84,7 +84,7 @@ Grafana.
                                  │
         ┌────────────────────────┼────────────────────────┐
         ▼                        ▼                        ▼
-   pytest (127 tests)      Docker image            GitHub Actions
+   pytest (141 tests)      Docker image            GitHub Actions
                                  │                  CI -> CD -> GHCR
                                  ▼
                     ┌──────────────────────────┐
@@ -156,7 +156,7 @@ loan-approval-mlops/
 │   ├── monitoring/              # PSI drift detection
 │   ├── utils/                   # logging + IO helpers
 │   └── config.py                # typed access to params.yaml
-├── tests/                       # 127 tests, 95% coverage
+├── tests/                       # 141 tests, 96% coverage
 ├── deployment/
 │   ├── docker/                  # docker-compose stack (API + Prometheus + Grafana)
 │   └── kubernetes/              # namespace, deployment, service, HPA, ingress, PDB,
@@ -290,7 +290,7 @@ experiment that produced the model.
 ## 4. Testing
 
 ```bash
-pytest                       # 127 tests, ~9s, coverage gate at 85%
+pytest                       # 141 tests, ~12s, coverage gate at 85%
 pytest -m "not integration"  # unit tests only
 pytest --cov-report=html     # browsable report in htmlcov/
 ```
@@ -308,7 +308,7 @@ pytest --cov-report=html     # browsable report in htmlcov/
 | `test_pipeline_stages.py` | all five stages end to end in a temp workspace |
 | `test_config_utils.py` | configuration resolution and IO helpers |
 
-Coverage is currently **95%** against an 85% gate enforced in `pyproject.toml`,
+Coverage is currently **96%** against an 85% gate enforced in `pyproject.toml`,
 so CI fails if coverage regresses.
 
 ---
@@ -542,7 +542,7 @@ run nightly on a CronJob.
 | Git practices | 4 | granular commits, `.gitignore`, no data or artefacts in git, branch-protected CI |
 | DVC usage | 4 | `data/raw/*.dvc`, `dvc.yaml` (5 stages), `dvc.lock`, remote + `dvc push`, params/metrics/plots tracking |
 | Data pipeline | 4 | `src/ingestion`, `src/validation` (schema contract), `src/transformation` (6 engineered features) |
-| Pytest coverage | 4 | `tests/` - 127 tests, 95% coverage, 85% gate in `pyproject.toml` |
+| Pytest coverage | 4 | `tests/` - 141 tests, 96% coverage, 85% gate in `pyproject.toml` |
 | MLflow tracking | 4 | `src/training/train.py` - nested runs, params, metrics, artefacts, signature, model registry |
 | FastAPI service | 4 | `src/prediction/` - 7 endpoints, Pydantic contract, lifespan model load, OpenAPI docs |
 | Dockerization | 4 | `Dockerfile` (multi-stage, non-root, healthcheck), `.dockerignore`, `docker-compose.yml` |
