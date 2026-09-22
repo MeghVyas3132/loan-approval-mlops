@@ -1,0 +1,22 @@
+# For clusters running the Prometheus Operator (kube-prometheus-stack).
+# Without the operator, the kubernetes_sd_configs job in
+# monitoring/prometheus/prometheus.yml scrapes the same pods.
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: loan-approval-api
+  namespace: mlops
+  labels:
+    release: kube-prometheus-stack
+spec:
+  selector:
+    matchLabels:
+      app: loan-approval-api
+  namespaceSelector:
+    matchNames:
+      - mlops
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s
+      scrapeTimeout: 10s

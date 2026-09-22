@@ -1,0 +1,41 @@
+# Nightly drift check over the applications scored that day.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: loan-approval-drift-check
+  namespace: mlops
+spec:
+  schedule: "0 2 * * *"            # 02:00 daily
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: drift
+              image: ghcr.io/OWNER/loan-approval-api:latest
+              command:
+                - python
+                - -m
+                - src.monitoring.drift
+                - --current
+                - /data/serving/latest.csv
+                - --fail-on-alert
+              volumeMounts:
+                - name: serving-data
+                  mountPath: /data/serving
+              resources:
+                requests:
+                  cpu: "100m"
+                  memory: "256Mi"
+                limits:
+                  cpu: "500m"
+                  memory: "512Mi"
+          volumes:
+            - name: serving-data
+              persistentVolumeClaim:
+                claimName: loan-approval-serving-data
