@@ -14,6 +14,9 @@ htmlcov/
 # DVC manages these: it writes the concrete ignore rules into data/*/.gitignore
 # and models/.gitignore, while the .dvc pointer files stay in git.
 
+# ---- runtime reports (the pipeline's own reports ARE tracked) ----
+reports/drift_report.json
+
 # ---- experiment tracking ----
 mlruns/
 mlartifacts/
