@@ -1,0 +1,37 @@
+{
+  "cv_score": 0.8141827611705205,
+  "cv_scoring": "roc_auc",
+  "feature_columns": [
+    "ApplicantIncome",
+    "CoapplicantIncome",
+    "LoanAmount",
+    "Loan_Amount_Term",
+    "Credit_History",
+    "TotalIncome",
+    "LogTotalIncome",
+    "LoanAmountPerMonth",
+    "DebtToIncomeRatio",
+    "IncomeToLoanRatio",
+    "HasCoapplicant",
+    "Gender",
+    "Married",
+    "Dependents",
+    "Education",
+    "Self_Employed",
+    "Property_Area"
+  ],
+  "mlflow_experiment_id": "1",
+  "mlflow_run_id": "56d8cf9ec42b4458adc1db4aeda7c731",
+  "model_name": "logistic_regression",
+  "model_path": "models/model.joblib",
+  "sklearn_version": "1.9.1",
+  "test_metrics": {
+    "accuracy": 0.788333,
+    "f1": 0.852839,
+    "precision": 0.7897,
+    "recall": 0.926952,
+    "roc_auc": 0.804854
+  },
+  "trained_at": "2026-09-22T17:59:17.781386+00:00",
+  "training_rows": 2400
+}
