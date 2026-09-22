@@ -1,0 +1,84 @@
+# Alerts covering the three things that break a deployed model:
+# the service, its latency, and the distribution of what it predicts.
+groups:
+  - name: loan-approval-availability
+    rules:
+      - alert: LoanApiDown
+        expr: up{job=~"loan-approval-api.*"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Loan approval API is unreachable"
+          description: "Prometheus has failed to scrape {{ $labels.instance }} for over a minute."
+
+      - alert: ModelNotLoaded
+        expr: loan_model_loaded == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Pod is serving without a model"
+          description: "{{ $labels.instance }} reports loan_model_loaded=0; /predict returns 503."
+
+  - name: loan-approval-performance
+    rules:
+      - alert: HighPredictionLatency
+        expr: histogram_quantile(0.95, sum(rate(loan_prediction_latency_seconds_bucket[5m])) by (le)) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "p95 inference latency above 500ms"
+          description: "p95 is {{ $value | humanizeDuration }} over the last 5 minutes."
+
+      - alert: ElevatedErrorRate
+        expr: |
+          sum(rate(http_requests_total{status=~"5.."}[5m]))
+            / clamp_min(sum(rate(http_requests_total[5m])), 0.001) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "More than 5% of requests are failing"
+
+      - alert: PredictionErrors
+        expr: increase(loan_prediction_errors_total[10m]) > 5
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Inference errors are accumulating"
+          description: "{{ $value }} failures in the last 10 minutes ({{ $labels.error_type }})."
+
+  - name: loan-approval-model-health
+    rules:
+      # A sustained swing in the approval rate is the cheapest live drift signal.
+      - alert: ApprovalRateSpike
+        expr: |
+          sum(rate(loan_predictions_total{decision="Approved"}[30m]))
+            / clamp_min(sum(rate(loan_predictions_total[30m])), 0.001) > 0.90
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Approval rate above 90% for 15 minutes"
+          description: "Check for upstream data issues or feature drift."
+
+      - alert: ApprovalRateCollapse
+        expr: |
+          sum(rate(loan_predictions_total{decision="Approved"}[30m]))
+            / clamp_min(sum(rate(loan_predictions_total[30m])), 0.001) < 0.20
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Approval rate below 20% for 15 minutes"
+
+      - alert: NoTrafficReceived
+        expr: sum(rate(loan_predictions_total[15m])) == 0
+        for: 15m
+        labels:
+          severity: info
+        annotations:
+          summary: "No predictions served in the last 15 minutes"
