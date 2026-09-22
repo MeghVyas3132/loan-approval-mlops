@@ -1,0 +1,52 @@
+name: Scheduled monitoring
+
+on:
+  schedule:
+    - cron: "0 3 * * *"       # 03:00 UTC daily
+  workflow_dispatch:
+
+jobs:
+  drift-check:
+    name: Data drift check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Materialise the reference and current datasets
+        # In a live system `--current` points at yesterday's scored applications
+        # pulled from the serving store; here the DVC-tracked split stands in.
+        run: |
+          dvc pull --allow-missing || python -m src.ingestion.generate_data
+          python -m src.ingestion.ingest
+
+      - name: Run the drift detector
+        run: python -m src.monitoring.drift --current data/processed/test.csv
+
+      - name: Publish the report
+        run: |
+          echo '### Data drift report' >> "$GITHUB_STEP_SUMMARY"
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          report = json.load(open("reports/drift_report.json"))
+          print(f"Status: **{report['status']}** (max PSI {report['max_psi']})\n")
+          print("| feature | type | PSI | status |")
+          print("| --- | --- | ---: | --- |")
+          for feature in report["features"]:
+              print(f"| {feature['feature']} | {feature['type']} | {feature['psi']} | {feature['status']} |")
+          PY
+
+      - name: Upload the report
+        uses: actions/upload-artifact@v4
+        with:
+          name: drift-report
+          path: reports/drift_report.json
+          retention-days: 30
