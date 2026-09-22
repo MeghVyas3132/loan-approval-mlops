@@ -1,0 +1,70 @@
+# Central configuration for every stage of the DVC pipeline.
+# Changing a value here invalidates only the stages that depend on it.
+
+base:
+  project_name: loan-approval-mlops
+  random_state: 42
+  target_column: Loan_Status
+  positive_label: 1
+
+data:
+  raw_path: data/raw/loan_applications.csv
+  n_samples: 3000
+  missing_rate: 0.04
+  train_path: data/processed/train.csv
+  test_path: data/processed/test.csv
+  test_size: 0.2
+  stratify: true
+
+validation:
+  report_path: reports/validation_report.json
+  max_missing_fraction: 0.15
+  min_rows: 500
+  expected_target_balance: [0.25, 0.75]   # allowed range for the positive class rate
+
+transformation:
+  preprocessor_path: models/preprocessor.joblib
+  train_features_path: data/processed/train_features.csv
+  test_features_path: data/processed/test_features.csv
+
+training:
+  model_dir: models
+  model_path: models/model.joblib
+  metadata_path: models/model_metadata.json
+  metrics_path: reports/train_metrics.json
+  cv_folds: 5
+  scoring: roc_auc
+  experiment_name: loan-approval
+  registered_model_name: loan-approval-classifier
+  candidates:
+    logistic_regression:
+      C: 1.0
+      max_iter: 1000
+    random_forest:
+      n_estimators: 300
+      max_depth: 8
+      min_samples_leaf: 5
+    gradient_boosting:
+      n_estimators: 200
+      learning_rate: 0.05
+      max_depth: 3
+
+evaluation:
+  metrics_path: reports/metrics.json
+  confusion_matrix_path: reports/confusion_matrix.json
+  roc_curve_path: reports/roc_curve.json
+  min_roc_auc: 0.70          # CI gate: the pipeline fails below this
+  min_f1: 0.60
+
+serving:
+  model_path: models/model.joblib
+  metadata_path: models/model_metadata.json
+  api_title: Loan Approval Prediction API
+  api_version: 1.0.0
+  approval_threshold: 0.5
+
+monitoring:
+  reference_path: data/processed/train.csv
+  drift_report_path: reports/drift_report.json
+  psi_warn: 0.1
+  psi_alert: 0.25

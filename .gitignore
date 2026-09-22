@@ -1,0 +1,25 @@
+# ---- python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.ruff_cache/
+
+# ---- data & models ----
+# DVC manages these: it writes the concrete ignore rules into data/*/.gitignore
+# and models/.gitignore, while the .dvc pointer files stay in git.
+
+# ---- experiment tracking ----
+mlruns/
+mlartifacts/
+mlflow.db
+
+# ---- os / editors ----
+.DS_Store
+.idea/
+.vscode/

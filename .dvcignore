@@ -1,0 +1,5 @@
+# Patterns DVC should never traverse
+.git/
+.venv/
+__pycache__/
+mlruns/
