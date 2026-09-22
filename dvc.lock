@@ -1,0 +1,193 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: python -m src.ingestion.ingest
+    deps:
+    - path: data/raw/loan_applications.csv
+      hash: md5
+      md5: 0dd218179ccb1b0c2b4483a7acb979c8
+      size: 206632
+    - path: src/config.py
+      hash: md5
+      md5: f7d587ead710a2994dce1b7840d1ed5f
+      size: 2120
+    - path: src/ingestion/ingest.py
+      hash: md5
+      md5: 3ebaf189998449b39ff7b448c5b53e2f
+      size: 2979
+    params:
+      params.yaml:
+        base.random_state: 42
+        base.target_column: Loan_Status
+        data.stratify: true
+        data.test_size: 0.2
+    outs:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: 471fe971cff32f380469f1b8ea0d8cb0
+      size: 41501
+    - path: data/processed/train.csv
+      hash: md5
+      md5: 0155cfda553f915a58044303d6c3446f
+      size: 165292
+  data_validation:
+    cmd: python -m src.validation.validate
+    deps:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: 471fe971cff32f380469f1b8ea0d8cb0
+      size: 41501
+    - path: data/processed/train.csv
+      hash: md5
+      md5: 0155cfda553f915a58044303d6c3446f
+      size: 165292
+    - path: src/validation/schema.py
+      hash: md5
+      md5: 7e6b8501f06e55ebab80d520c669327f
+      size: 3255
+    - path: src/validation/validate.py
+      hash: md5
+      md5: ecacc90874895c427d4d1a04f48a47ca
+      size: 6186
+    params:
+      params.yaml:
+        validation:
+          report_path: reports/validation_report.json
+          max_missing_fraction: 0.15
+          min_rows: 500
+          expected_target_balance:
+          - 0.25
+          - 0.75
+    outs:
+    - path: reports/validation_report.json
+      hash: md5
+      md5: 86bf05fd2a70b20a0bc8611046418fa8
+      size: 5287
+  data_transformation:
+    cmd: python -m src.transformation.transform
+    deps:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: 471fe971cff32f380469f1b8ea0d8cb0
+      size: 41501
+    - path: data/processed/train.csv
+      hash: md5
+      md5: 0155cfda553f915a58044303d6c3446f
+      size: 165292
+    - path: reports/validation_report.json
+      hash: md5
+      md5: 86bf05fd2a70b20a0bc8611046418fa8
+      size: 5287
+    - path: src/transformation/features.py
+      hash: md5
+      md5: e82a9e5ea24bdc04e3951786a0898e0f
+      size: 3779
+    - path: src/transformation/transform.py
+      hash: md5
+      md5: f7f204c656b687347cdc48414ae52a5c
+      size: 2064
+    outs:
+    - path: data/processed/test_features.csv
+      hash: md5
+      md5: c4a86b17dbdb31c57daf03e4375692ae
+      size: 87039
+    - path: data/processed/train_features.csv
+      hash: md5
+      md5: fe70ffeb8217dcc7a0b39c7b6b864bea
+      size: 346996
+    - path: models/preprocessor.joblib
+      hash: md5
+      md5: f9c2dcf14b29670ba6ab8c7607d6a850
+      size: 5526
+  model_training:
+    cmd: python -m src.training.train
+    deps:
+    - path: data/processed/test_features.csv
+      hash: md5
+      md5: c4a86b17dbdb31c57daf03e4375692ae
+      size: 87039
+    - path: data/processed/train_features.csv
+      hash: md5
+      md5: fe70ffeb8217dcc7a0b39c7b6b864bea
+      size: 346996
+    - path: src/training/train.py
+      hash: md5
+      md5: 905b665a4df639f206ab5fb37d8bbd07
+      size: 10357
+    - path: src/transformation/features.py
+      hash: md5
+      md5: e82a9e5ea24bdc04e3951786a0898e0f
+      size: 3779
+    params:
+      params.yaml:
+        base.random_state: 42
+        training:
+          model_dir: models
+          model_path: models/model.joblib
+          metadata_path: models/model_metadata.json
+          metrics_path: reports/train_metrics.json
+          cv_folds: 5
+          scoring: roc_auc
+          experiment_name: loan-approval
+          registered_model_name: loan-approval-classifier
+          candidates:
+            logistic_regression:
+              C: 1.0
+              max_iter: 1000
+            random_forest:
+              n_estimators: 300
+              max_depth: 8
+              min_samples_leaf: 5
+            gradient_boosting:
+              n_estimators: 200
+              learning_rate: 0.05
+              max_depth: 3
+    outs:
+    - path: models/model.joblib
+      hash: md5
+      md5: df6de5d7a99e306eb394084be2d35cdc
+      size: 6330
+    - path: models/model_metadata.json
+      hash: md5
+      md5: 2c13bc23e64fe7fff96abb8f3ffe8b94
+      size: 863
+    - path: reports/train_metrics.json
+      hash: md5
+      md5: cc1fd00899e4f094577a51eb444fa181
+      size: 971
+  model_evaluation:
+    cmd: python -m src.training.evaluate
+    deps:
+    - path: data/processed/test_features.csv
+      hash: md5
+      md5: c4a86b17dbdb31c57daf03e4375692ae
+      size: 87039
+    - path: models/model.joblib
+      hash: md5
+      md5: df6de5d7a99e306eb394084be2d35cdc
+      size: 6330
+    - path: src/training/evaluate.py
+      hash: md5
+      md5: 2c7021be74652a5d0f3e317a1e5aeb42
+      size: 3326
+    params:
+      params.yaml:
+        evaluation:
+          metrics_path: reports/metrics.json
+          confusion_matrix_path: reports/confusion_matrix.json
+          roc_curve_path: reports/roc_curve.json
+          min_roc_auc: 0.7
+          min_f1: 0.6
+    outs:
+    - path: reports/confusion_matrix.json
+      hash: md5
+      md5: 2b26ba82cdc381d6d43f75ad12394cd5
+      size: 117
+    - path: reports/metrics.json
+      hash: md5
+      md5: 5e1ddb9d5117fdd1cba6eb7fd6b9c28b
+      size: 113
+    - path: reports/roc_curve.json
+      hash: md5
+      md5: 18e5ee6bc9a7426d99af12e8f6a16581
+      size: 16547

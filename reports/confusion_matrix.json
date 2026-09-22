@@ -1,0 +1,7 @@
+{
+  "false_negative": 29,
+  "false_positive": 98,
+  "support": 600,
+  "true_negative": 105,
+  "true_positive": 368
+}

@@ -1,0 +1,82 @@
+# Reproducible pipeline: `dvc repro` re-runs only the stages whose code,
+# data or parameters changed.
+
+stages:
+  data_ingestion:
+    cmd: python -m src.ingestion.ingest
+    deps:
+      - src/ingestion/ingest.py
+      - src/config.py
+      - data/raw/loan_applications.csv
+    params:
+      - base.random_state
+      - base.target_column
+      - data.test_size
+      - data.stratify
+    outs:
+      - data/processed/train.csv
+      - data/processed/test.csv
+
+  data_validation:
+    cmd: python -m src.validation.validate
+    deps:
+      - src/validation/validate.py
+      - src/validation/schema.py
+      - data/processed/train.csv
+      - data/processed/test.csv
+    params:
+      - validation
+    outs:
+      - reports/validation_report.json:
+          cache: false
+
+  data_transformation:
+    cmd: python -m src.transformation.transform
+    deps:
+      - src/transformation/transform.py
+      - src/transformation/features.py
+      - data/processed/train.csv
+      - data/processed/test.csv
+      - reports/validation_report.json
+    outs:
+      - data/processed/train_features.csv
+      - data/processed/test_features.csv
+      - models/preprocessor.joblib
+
+  model_training:
+    cmd: python -m src.training.train
+    deps:
+      - src/training/train.py
+      - src/transformation/features.py
+      - data/processed/train_features.csv
+      - data/processed/test_features.csv
+    params:
+      - base.random_state
+      - training
+    outs:
+      - models/model.joblib
+      - models/model_metadata.json:
+          cache: false
+    metrics:
+      - reports/train_metrics.json:
+          cache: false
+
+  model_evaluation:
+    cmd: python -m src.training.evaluate
+    deps:
+      - src/training/evaluate.py
+      - models/model.joblib
+      - data/processed/test_features.csv
+    params:
+      - evaluation
+    metrics:
+      - reports/metrics.json:
+          cache: false
+    plots:
+      - reports/roc_curve.json:
+          cache: false
+          x: fpr
+          y: tpr
+          title: ROC curve (hold-out)
+      - reports/confusion_matrix.json:
+          cache: false

@@ -1,0 +1,233 @@
+{
+  "datasets": [
+    {
+      "column_checks": [
+        {
+          "column": "Gender",
+          "dtype": "categorical",
+          "missing_fraction": 0.04,
+          "observed_values": [
+            "Female",
+            "Male"
+          ]
+        },
+        {
+          "column": "Married",
+          "dtype": "categorical",
+          "missing_fraction": 0.0387,
+          "observed_values": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "column": "Dependents",
+          "dtype": "categorical",
+          "missing_fraction": 0.0404,
+          "observed_values": [
+            "0",
+            "1",
+            "2",
+            "3+"
+          ]
+        },
+        {
+          "column": "Education",
+          "dtype": "categorical",
+          "missing_fraction": 0.0,
+          "observed_values": [
+            "Graduate",
+            "Not Graduate"
+          ]
+        },
+        {
+          "column": "Self_Employed",
+          "dtype": "categorical",
+          "missing_fraction": 0.0483,
+          "observed_values": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "column": "ApplicantIncome",
+          "dtype": "numeric",
+          "max": 31445.0,
+          "mean": 5445.2754,
+          "min": 581.0,
+          "missing_fraction": 0.0
+        },
+        {
+          "column": "CoapplicantIncome",
+          "dtype": "numeric",
+          "max": 19114.0,
+          "mean": 1216.6617,
+          "min": 0.0,
+          "missing_fraction": 0.0
+        },
+        {
+          "column": "LoanAmount",
+          "dtype": "numeric",
+          "max": 700.0,
+          "mean": 183.7805,
+          "min": 15.0,
+          "missing_fraction": 0.0433
+        },
+        {
+          "column": "Loan_Amount_Term",
+          "dtype": "numeric",
+          "max": 360.0,
+          "mean": 323.1127,
+          "min": 60.0,
+          "missing_fraction": 0.0421
+        },
+        {
+          "column": "Credit_History",
+          "dtype": "numeric",
+          "max": 1.0,
+          "mean": 0.841,
+          "min": 0.0,
+          "missing_fraction": 0.0354
+        },
+        {
+          "column": "Property_Area",
+          "dtype": "categorical",
+          "missing_fraction": 0.0,
+          "observed_values": [
+            "Rural",
+            "Semiurban",
+            "Urban"
+          ]
+        }
+      ],
+      "columns": 13,
+      "dataset": "train",
+      "duplicate_rows": 0,
+      "errors": [],
+      "rows": 2400,
+      "status": "passed",
+      "target": {
+        "allowed_range": [
+          0.25,
+          0.75
+        ],
+        "positive_rate": 0.6617
+      }
+    },
+    {
+      "column_checks": [
+        {
+          "column": "Gender",
+          "dtype": "categorical",
+          "missing_fraction": 0.035,
+          "observed_values": [
+            "Female",
+            "Male"
+          ]
+        },
+        {
+          "column": "Married",
+          "dtype": "categorical",
+          "missing_fraction": 0.0367,
+          "observed_values": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "column": "Dependents",
+          "dtype": "categorical",
+          "missing_fraction": 0.0367,
+          "observed_values": [
+            "0",
+            "1",
+            "2",
+            "3+"
+          ]
+        },
+        {
+          "column": "Education",
+          "dtype": "categorical",
+          "missing_fraction": 0.0,
+          "observed_values": [
+            "Graduate",
+            "Not Graduate"
+          ]
+        },
+        {
+          "column": "Self_Employed",
+          "dtype": "categorical",
+          "missing_fraction": 0.035,
+          "observed_values": [
+            "No",
+            "Yes"
+          ]
+        },
+        {
+          "column": "ApplicantIncome",
+          "dtype": "numeric",
+          "max": 24578.0,
+          "mean": 5068.8633,
+          "min": 1052.0,
+          "missing_fraction": 0.0
+        },
+        {
+          "column": "CoapplicantIncome",
+          "dtype": "numeric",
+          "max": 10516.0,
+          "mean": 1230.0767,
+          "min": 0.0,
+          "missing_fraction": 0.0
+        },
+        {
+          "column": "LoanAmount",
+          "dtype": "numeric",
+          "max": 661.0,
+          "mean": 180.3659,
+          "min": 20.0,
+          "missing_fraction": 0.0433
+        },
+        {
+          "column": "Loan_Amount_Term",
+          "dtype": "numeric",
+          "max": 360.0,
+          "mean": 326.8345,
+          "min": 60.0,
+          "missing_fraction": 0.0333
+        },
+        {
+          "column": "Credit_History",
+          "dtype": "numeric",
+          "max": 1.0,
+          "mean": 0.8526,
+          "min": 0.0,
+          "missing_fraction": 0.05
+        },
+        {
+          "column": "Property_Area",
+          "dtype": "categorical",
+          "missing_fraction": 0.0,
+          "observed_values": [
+            "Rural",
+            "Semiurban",
+            "Urban"
+          ]
+        }
+      ],
+      "columns": 13,
+      "dataset": "test",
+      "duplicate_rows": 0,
+      "errors": [],
+      "rows": 600,
+      "status": "passed",
+      "target": {
+        "allowed_range": [
+          0.25,
+          0.75
+        ],
+        "positive_rate": 0.6617
+      }
+    }
+  ],
+  "status": "passed"
+}
