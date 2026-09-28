@@ -17,7 +17,7 @@ spec:
           restartPolicy: OnFailure
           containers:
             - name: drift
-              image: ghcr.io/OWNER/loan-approval-api:latest
+              image: ghcr.io/meghvyas3132/loan-approval-mlops/loan-approval-api:latest
               command:
                 - python
                 - -m

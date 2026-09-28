@@ -24,7 +24,7 @@ FROM python:3.11-slim AS runtime
 
 LABEL org.opencontainers.image.title="loan-approval-api" \
       org.opencontainers.image.description="Loan approval prediction service (MLOps end-term project)" \
-      org.opencontainers.image.source="https://github.com/<your-org>/loan-approval-mlops"
+      org.opencontainers.image.source="https://github.com/MeghVyas3132/loan-approval-mlops"
 
 ENV PATH="/opt/venv/bin:$PATH" \
     PYTHONUNBUFFERED=1 \

@@ -104,7 +104,8 @@ jobs:
       - name: Apply manifests
         if: env.SKIP_DEPLOY != 'true'
         run: |
-          IMAGE="${REGISTRY}/${IMAGE_NAME}:sha-${GITHUB_SHA::7}"
+          # Registry paths must be lowercase; github.repository keeps the owner's casing.
+          IMAGE="${REGISTRY}/${IMAGE_NAME,,}:sha-${GITHUB_SHA::7}"
           kubectl apply -f deployment/kubernetes/namespace.yaml
           kubectl apply -f deployment/kubernetes/configmap.yaml
           kubectl apply -f deployment/kubernetes/deployment.yaml
