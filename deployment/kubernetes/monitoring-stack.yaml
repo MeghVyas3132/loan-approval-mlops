@@ -1,5 +1,10 @@
 # Self-contained Prometheus + Grafana for clusters without kube-prometheus-stack.
-# Apply after the API:
+# Apply after the API (or run `make k8s-monitoring`):
+#   kubectl -n mlops create secret generic grafana-admin --from-literal=password=<choose-one>
+#   kubectl -n mlops create configmap grafana-dashboard-provider \
+#     --from-file=monitoring/grafana/provisioning/dashboards/dashboards.yml
+#   kubectl -n mlops create configmap grafana-dashboards \
+#     --from-file=monitoring/grafana/dashboards/
 #   kubectl apply -f deployment/kubernetes/monitoring-stack.yaml
 #   kubectl -n mlops port-forward svc/grafana 3000:3000
 ---

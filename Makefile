@@ -7,7 +7,7 @@ COMPOSE := docker compose -f deployment/docker/docker-compose.yml
 IMAGE ?= loan-approval-api:local
 NAMESPACE ?= mlops
 
-.PHONY: help install data pipeline repro metrics test lint format api docker-build docker-run \
+.PHONY: help install data pipeline repro metrics test lint format api docker-build docker-run k8s-monitoring \
         compose-up compose-down mlflow k8s-deploy k8s-delete k8s-status drift clean
 
 help:  ## Show this help
@@ -69,6 +69,18 @@ k8s-deploy:  ## Apply every Kubernetes manifest
 	kubectl apply -f deployment/kubernetes/hpa.yaml
 	kubectl apply -f deployment/kubernetes/pdb.yaml
 	kubectl -n $(NAMESPACE) rollout status deployment/loan-approval-api
+
+GRAFANA_PASSWORD ?= admin
+
+k8s-monitoring:  ## Deploy in-cluster Prometheus + Grafana with the dashboard
+	kubectl -n $(NAMESPACE) create secret generic grafana-admin \
+		--from-literal=password=$(GRAFANA_PASSWORD) --dry-run=client -o yaml | kubectl apply -f -
+	kubectl -n $(NAMESPACE) create configmap grafana-dashboard-provider \
+		--from-file=monitoring/grafana/provisioning/dashboards/dashboards.yml --dry-run=client -o yaml | kubectl apply -f -
+	kubectl -n $(NAMESPACE) create configmap grafana-dashboards \
+		--from-file=monitoring/grafana/dashboards/ --dry-run=client -o yaml | kubectl apply -f -
+	kubectl apply -f deployment/kubernetes/monitoring-stack.yaml
+	kubectl -n $(NAMESPACE) rollout status deployment/grafana
 
 k8s-status:  ## Show what is running in the cluster
 	kubectl -n $(NAMESPACE) get pods,svc,hpa
