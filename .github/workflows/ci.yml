@@ -96,9 +96,11 @@ jobs:
           restore-keys: dvc-${{ runner.os }}-
 
       # A real project pulls from remote storage. Without credentials in a fork,
-      # the raw file is regenerated from its versioned, deterministic generator.
+      # the raw file is regenerated from its versioned, deterministic generator
+      # (same md5 as the .dvc pointer). `dvc pull --allow-missing` exits 0 even
+      # when nothing was fetched, so the fallback checks for the file itself.
       - name: Fetch data
-        run: dvc pull --allow-missing || python -m src.ingestion.generate_data
+        run: dvc pull --allow-missing || true; test -f data/raw/loan_applications.csv || python -m src.ingestion.generate_data
 
       - name: Reproduce the pipeline
         run: dvc repro --force

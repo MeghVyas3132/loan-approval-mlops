@@ -25,7 +25,7 @@ jobs:
         # In a live system `--current` points at yesterday's scored applications
         # pulled from the serving store; here the DVC-tracked split stands in.
         run: |
-          dvc pull --allow-missing || python -m src.ingestion.generate_data
+          dvc pull --allow-missing || true; test -f data/raw/loan_applications.csv || python -m src.ingestion.generate_data
           python -m src.ingestion.ingest
 
       - name: Run the drift detector

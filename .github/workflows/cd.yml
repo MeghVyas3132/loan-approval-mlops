@@ -43,7 +43,7 @@ jobs:
       # The image ships a model, so the pipeline runs before the build.
       - name: Produce the model artefact
         run: |
-          dvc pull --allow-missing || python -m src.ingestion.generate_data
+          dvc pull --allow-missing || true; test -f data/raw/loan_applications.csv || python -m src.ingestion.generate_data
           dvc repro
           python -m src.training.evaluate
 
